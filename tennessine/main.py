@@ -1,9 +1,11 @@
 import configparser
 import logging
 import logging.config
+# tuple annotation is available in Python 3.9
 from typing import Optional, Tuple, Union
 
 import pygame
+
 
 logging.config.fileConfig("log.ini")
 logger: logging.Logger = logging.getLogger()
@@ -14,78 +16,25 @@ config.read("config.ini")
 x: int = 0
 y: int = 0
 
+# typing.TypeAlias annotation is available in Python 3.10
+RectValue = Tuple[
+    Union[float, int], Union[float, int], Union[float, int], Union[float, int]
+]
 
-def draw_background(surface: pygame.surface.Surface, rect: Optional[
-        Tuple[
-            Union[float, int], Union[float, int], Union[float, int], Union[float, int]
-        ]
-    ] = None):
+
+def draw_background(
+    surface: pygame.surface.Surface,
+    rect: Optional[RectValue] = None,
+) -> None:
+    # match case statement is available in Python 3.10
     background: str = config.get("world", "background")
     if background == "transgender_flag":
-        draw_transgender_flag(surface, rect)
+        # draw_transgender_flag(surface, rect)
         return
     if background == "rainbow_flag":
-        draw_rainbow_flag(surface, rect)
+        # draw_rainbow_flag(surface, rect)
         return
-    raise RuntimeError
-
-def draw_transgender_flag(
-    surface: pygame.surface.Surface,
-    rect: Optional[
-        Tuple[
-            Union[float, int], Union[float, int], Union[float, int], Union[float, int]
-        ]
-    ] = None,
-):
-    if not rect:
-        rect = (0, 0, surface.get_width(), surface.get_height())
-    pygame.draw.rect(surface, (91, 206, 250), (rect[0], rect[1], rect[2], rect[3]))
-    pygame.draw.rect(
-        surface,
-        (245, 169, 184),
-        (rect[0], rect[1] + rect[3] / 5, rect[2], rect[3] / 5 * 3),
-    )
-    pygame.draw.rect(
-        surface,
-        (255, 255, 255),
-        (rect[0], rect[1] + rect[3] / 5 * 2, rect[2], rect[3] / 5),
-    )
-
-
-def draw_rainbow_flag(
-    surface: pygame.surface.Surface,
-    rect: Optional[
-        Tuple[
-            Union[float, int], Union[float, int], Union[float, int], Union[float, int]
-        ]
-    ] = None,
-):
-    if not rect:
-        rect = (0, 0, surface.get_width(), surface.get_height())
-    pygame.draw.rect(surface, (229, 0, 0), (rect[0], rect[1], rect[2], rect[3] / 6))
-    pygame.draw.rect(
-        surface, (255, 141, 0), (rect[0], rect[1] + rect[3] / 6, rect[2], rect[3] / 6)
-    )
-    pygame.draw.rect(
-        surface,
-        (255, 238, 0),
-        (rect[0], rect[1] + rect[3] / 6 * 2, rect[2], rect[3] / 6),
-    )
-    pygame.draw.rect(
-        surface,
-        (2, 129, 33),
-        (rect[0], rect[1] + rect[3] / 6 * 3, rect[2], rect[3] / 6),
-    )
-    pygame.draw.rect(
-        surface,
-        (0, 76, 255),
-        (rect[0], rect[1] + rect[3] / 6 * 4, rect[2], rect[3] / 6),
-    )
-    pygame.draw.rect(
-        surface,
-        (119, 0, 136),
-        (rect[0], rect[1] + rect[3] / 6 * 5, rect[2], rect[3] / 6),
-    )
+    logger.warning("")
 
 
 class RadarMap(pygame.sprite.Sprite):
@@ -97,7 +46,7 @@ class RadarMap(pygame.sprite.Sprite):
                 config.getint("radarmap", "width"),
                 config.getint("radarmap", "width")
                 * config.getint("world", "height")
-                / config.getint("world", "width")
+                / config.getint("world", "width"),
             )
         )
         draw_background(self.image)
@@ -149,7 +98,7 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 running: bool = False
 
-        keys = pygame.key.get_pressed()
+        keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             if y - config.getint("move", "step") < 0:
                 y: int = 0
@@ -170,7 +119,6 @@ if __name__ == "__main__":
             else:
                 y += config.getint("move", "step")
         if keys[pygame.K_RIGHT]:
-
             if x + config.getint("move", "step") + config.getint(
                 "window", "width"
             ) > config.getint("world", "width"):

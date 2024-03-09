@@ -1,0 +1,71 @@
+{
+    "$schema": "./background.json",
+    "manifest_version": 1,
+    "width": 777,
+    "height": 480,
+    "colors": [
+        {
+            "name": "red",
+            "color": [229, 0, 0]
+        },
+        {
+            "name": "orange",
+            "color": [255, 241, 0]
+        },
+        {
+            "name": "yellow",
+            "color": [255, 238, 0]
+        },
+        {
+            "name": "green",
+            "color": [2, 129, 33]
+        },
+        {
+            "name": "blue",
+            "color": [0, 76, 255]
+        },
+        {
+            "name": "purple",
+            "color": [119, 0, 136]
+        }
+    ],
+    "objects": [
+        {
+            "fill": "purple",
+            "type": "rect",
+            "width": 777,
+            "height": 480
+        },
+        {
+            "fill": "blue",
+            "type": "rect",
+            "width": 777,
+            "height": 400,
+            "y": 80
+        },
+        {
+            "fill": "green",
+            "type": "rect",
+            "width": 777,
+            "height": 320
+        },
+        {
+            "fill": "yellow",
+            "type": "rect",
+            "width": 777,
+            "height": 240
+        },
+        {
+            "fill": "orange",
+            "type": "rect",
+            "width": 777,
+            "height": 160
+        },
+        {
+            "fill": "red",
+            "type": "rect",
+            "width": 777,
+            "height": 80
+        }
+    ]
+}
