@@ -16,33 +16,14 @@
             "type": "integer",
             "minimum": 0
         },
-        "colors": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "color": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "maximum": 255,
-                            "minimum": 0
-                        },
-                        "maxLength": 3
-                    }
-                }
-            }
-        },
         "objects": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
                     "fill": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": ""
                     },
                     "type": {
                         "type": "string",

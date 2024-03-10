@@ -1,14 +1,30 @@
+import json
 import configparser
-import logging
-import logging.config
+
 # tuple annotation is available in Python 3.9
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Any
 
 import pygame
 
 
-logging.config.fileConfig("log.ini")
-logger: logging.Logger = logging.getLogger()
+try:
+    from rich.console import Console
+
+    console: Console = Console()
+
+    def log(message: str) -> None:
+        console.log(message)
+
+except ImportError:
+    import logging
+    import logging.config
+
+    logging.config.fileConfig("log.ini")
+    logger: logging.Logger = logging.getLogger()
+
+    def log(message: str) -> None:
+        logger.log(logging.INFO, message)
+
 
 config: configparser.ConfigParser = configparser.ConfigParser()
 config.read("config.ini")
@@ -21,20 +37,48 @@ RectValue = Tuple[
     Union[float, int], Union[float, int], Union[float, int], Union[float, int]
 ]
 
+debug: bool = True
 
-def draw_background(
-    surface: pygame.surface.Surface,
-    rect: Optional[RectValue] = None,
-) -> None:
-    # match case statement is available in Python 3.10
-    background: str = config.get("world", "background")
-    if background == "transgender_flag":
-        # draw_transgender_flag(surface, rect)
-        return
-    if background == "rainbow_flag":
-        # draw_rainbow_flag(surface, rect)
-        return
-    logger.warning("")
+
+class Background:
+    def __init__(self, background_data: Any) -> None:
+        if background_data["manifest_version"] != 1:
+            raise RuntimeError("Unsupport manifest_version")
+        self.width: int = background_data["width"]
+        self.height: int = background_data["height"]
+        self.objects: Any = []
+        for object_data in background_data["objects"]:
+            self.objects.append(
+                {
+                    "fill": object_data["fill"],
+                    "width": object_data["width"],
+                    "height": object_data["height"],
+                    "x": object_data.get("x", 0),
+                    "y": object_data.get("y", 0),
+                }
+            )
+
+    def draw_background(
+        self, surface: pygame.surface.Surface, rect: Optional[RectValue] = None
+    ) -> None:
+        global debug
+
+        if not rect:
+            rect = (0, 0, surface.get_width(), surface.get_height())
+        for object_data in self.objects:
+            # width: int = self.width * object_data["width"] / rect[2]
+            # height: int = self.height * object_data["height"] / rect[3]
+            pygame.draw.rect(
+                surface,
+                object_data["fill"],
+                (rect[0] + object_data["x"], rect[1] + object_data["y"], object_data["width"], object_data["height"]),
+            )
+        debug = False
+
+
+_background: Background = Background(
+    json.load(open(config.get("world", "background"), "r"))
+)
 
 
 class RadarMap(pygame.sprite.Sprite):
@@ -49,7 +93,7 @@ class RadarMap(pygame.sprite.Sprite):
                 / config.getint("world", "width"),
             )
         )
-        draw_background(self.image)
+        _background.draw_background(self.image)
 
         self.rect: pygame.rect.Rect = self.image.get_rect()
         self.rect.x = config.getint("window", "width") - config.getint(
@@ -57,7 +101,7 @@ class RadarMap(pygame.sprite.Sprite):
         )
 
     def update(self) -> None:
-        draw_background(self.image)
+        _background.draw_background(self.image)
         pygame.draw.rect(
             self.image,
             (255, 255, 255),
@@ -84,7 +128,7 @@ if __name__ == "__main__":
         (config.getint("world", "width"), config.getint("world", "height"))
     )
     clock: pygame.time.Clock = pygame.time.Clock()
-    draw_background(
+    _background.draw_background(
         world, (0, 0, config.getint("world", "width"), config.getint("world", "height"))
     )
     group: pygame.sprite.Group = pygame.sprite.Group()

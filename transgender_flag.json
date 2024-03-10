@@ -3,36 +3,26 @@
     "manifest_version": 1,
     "width": 800,
     "height": 400,
-    "colors": [
-        {
-            "name": "blue",
-            "color": [91, 206, 250]
-        },
-        {
-            "name": "pink",
-            "color": [245, 169, 184]
-        },
-        {
-            "name": "white",
-            "color": [255, 255, 255]
-        }
-    ],
     "objects": [
         {
+            "fill": "#5BCEFA",
             "type": "rect",
             "width": 800,
             "height": 480
         },
         {
+            "fill": "#F5A9B8",
             "type": "rect",
             "width": 800,
             "height": 288,
             "y": 96
         },
         {
+            "fill": "#FFFFFF",
             "type": "rect",
             "width": 800,
-            "height": 192
+            "height": 96,
+            "y": 192
         }
     ]
 }

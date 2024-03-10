@@ -3,66 +3,44 @@
     "manifest_version": 1,
     "width": 777,
     "height": 480,
-    "colors": [
-        {
-            "name": "red",
-            "color": [229, 0, 0]
-        },
-        {
-            "name": "orange",
-            "color": [255, 241, 0]
-        },
-        {
-            "name": "yellow",
-            "color": [255, 238, 0]
-        },
-        {
-            "name": "green",
-            "color": [2, 129, 33]
-        },
-        {
-            "name": "blue",
-            "color": [0, 76, 255]
-        },
-        {
-            "name": "purple",
-            "color": [119, 0, 136]
-        }
-    ],
     "objects": [
         {
-            "fill": "purple",
+            "fill": "#770088",
             "type": "rect",
             "width": 777,
-            "height": 480
+            "height": 80,
+            "y": 400
         },
         {
-            "fill": "blue",
+            "fill": "#004CFF",
             "type": "rect",
             "width": 777,
-            "height": 400,
+            "height": 80,
+            "y": 320
+        },
+        {
+            "fill": "#028121",
+            "type": "rect",
+            "width": 777,
+            "height": 80,
+            "y": 240
+        },
+        {
+            "fill": "#FFEE00",
+            "type": "rect",
+            "width": 777,
+            "height": 80,
+            "y": 160
+        },
+        {
+            "fill": "#FF8D00",
+            "type": "rect",
+            "width": 777,
+            "height": 80,
             "y": 80
         },
         {
-            "fill": "green",
-            "type": "rect",
-            "width": 777,
-            "height": 320
-        },
-        {
-            "fill": "yellow",
-            "type": "rect",
-            "width": 777,
-            "height": 240
-        },
-        {
-            "fill": "orange",
-            "type": "rect",
-            "width": 777,
-            "height": 160
-        },
-        {
-            "fill": "red",
+            "fill": "#E50000",
             "type": "rect",
             "width": 777,
             "height": 80
