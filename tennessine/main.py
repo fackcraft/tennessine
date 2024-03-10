@@ -7,25 +7,6 @@ from typing import Optional, Tuple, Union, Any
 import pygame
 
 
-try:
-    from rich.console import Console
-
-    console: Console = Console()
-
-    def log(message: str) -> None:
-        console.log(message)
-
-except ImportError:
-    import logging
-    import logging.config
-
-    logging.config.fileConfig("log.ini")
-    logger: logging.Logger = logging.getLogger()
-
-    def log(message: str) -> None:
-        logger.log(logging.INFO, message)
-
-
 config: configparser.ConfigParser = configparser.ConfigParser()
 config.read("config.ini")
 
@@ -71,7 +52,12 @@ class Background:
             pygame.draw.rect(
                 surface,
                 object_data["fill"],
-                (rect[0] + object_data["x"], rect[1] + object_data["y"], object_data["width"], object_data["height"]),
+                (
+                    rect[0] + object_data["x"],
+                    rect[1] + object_data["y"],
+                    object_data["width"],
+                    object_data["height"],
+                ),
             )
         debug = False
 
