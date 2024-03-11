@@ -1,7 +1,6 @@
 import json
 import configparser
 
-# tuple annotation is available in Python 3.9
 from typing import Optional, Tuple, Union, Any
 
 import pygame
@@ -13,7 +12,6 @@ config.read("config.ini")
 x: int = 0
 y: int = 0
 
-# typing.TypeAlias annotation is available in Python 3.10
 RectValue = Tuple[
     Union[float, int], Union[float, int], Union[float, int], Union[float, int]
 ]
