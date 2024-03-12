@@ -1,10 +1,10 @@
-import json
 import configparser
 
-from typing import Optional, Tuple, Union, Any
+from typing import Tuple, Union
 
 import pygame
 
+from tennessine.world import World
 
 config: configparser.ConfigParser = configparser.ConfigParser()
 config.read("config.ini")
@@ -15,54 +15,6 @@ y: int = 0
 RectValue = Tuple[
     Union[float, int], Union[float, int], Union[float, int], Union[float, int]
 ]
-
-debug: bool = True
-
-
-class Background:
-    def __init__(self, background_data: Any) -> None:
-        if background_data["manifest_version"] != 1:
-            raise RuntimeError("Unsupport manifest_version")
-        self.width: int = background_data["width"]
-        self.height: int = background_data["height"]
-        self.objects: Any = []
-        for object_data in background_data["objects"]:
-            self.objects.append(
-                {
-                    "fill": object_data["fill"],
-                    "width": object_data["width"],
-                    "height": object_data["height"],
-                    "x": object_data.get("x", 0),
-                    "y": object_data.get("y", 0),
-                }
-            )
-
-    def draw_background(
-        self, surface: pygame.surface.Surface, rect: Optional[RectValue] = None
-    ) -> None:
-        global debug
-
-        if not rect:
-            rect = (0, 0, surface.get_width(), surface.get_height())
-        for object_data in self.objects:
-            # width: int = self.width * object_data["width"] / rect[2]
-            # height: int = self.height * object_data["height"] / rect[3]
-            pygame.draw.rect(
-                surface,
-                object_data["fill"],
-                (
-                    rect[0] + object_data["x"],
-                    rect[1] + object_data["y"],
-                    object_data["width"],
-                    object_data["height"],
-                ),
-            )
-        debug = False
-
-
-_background: Background = Background(
-    json.load(open(config.get("world", "background"), "r"))
-)
 
 
 class RadarMap(pygame.sprite.Sprite):
@@ -77,15 +29,13 @@ class RadarMap(pygame.sprite.Sprite):
                 / config.getint("world", "width"),
             )
         )
-        _background.draw_background(self.image)
-
         self.rect: pygame.rect.Rect = self.image.get_rect()
         self.rect.x = config.getint("window", "width") - config.getint(
             "radarmap", "width"
         )
 
     def update(self) -> None:
-        _background.draw_background(self.image)
+        # draw
         pygame.draw.rect(
             self.image,
             (255, 255, 255),
@@ -108,13 +58,8 @@ if __name__ == "__main__":
     screen: pygame.surface.Surface = pygame.display.set_mode(
         (config.getint("window", "width"), config.getint("window", "height"))
     )
-    world: pygame.surface.Surface = pygame.Surface(
-        (config.getint("world", "width"), config.getint("world", "height"))
-    )
+    world: World = World((config.getint("world", "width"), config.getint("world", "height")))
     clock: pygame.time.Clock = pygame.time.Clock()
-    _background.draw_background(
-        world, (0, 0, config.getint("world", "width"), config.getint("world", "height"))
-    )
     group: pygame.sprite.Group = pygame.sprite.Group()
     radar_map: RadarMap = RadarMap()
     group.add(radar_map)
@@ -156,7 +101,7 @@ if __name__ == "__main__":
             else:
                 x += config.getint("move", "step")
 
-        background: pygame.surface.Surface = world.subsurface(
+        background: pygame.surface.Surface = world.image.subsurface(
             (x, y, config.getint("window", "width"), config.getint("window", "height"))
         )
         screen.blit(background, (0, 0))

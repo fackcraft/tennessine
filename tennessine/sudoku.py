@@ -1,10 +1,14 @@
-import pdb
+import sys
+import random
 
-from typing import List
+from typing import List, Any
 
 
 class Sudoku:
-    def __init__(self) -> None:
+    def __init__(self, seed: Any = None) -> None:
+        if not seed:
+            seed = random.random()
+        self.random = random.Random(seed)
         self.table: List[int] = [0 for _ in range(81)]
         self.generate(0)
 
@@ -13,15 +17,11 @@ class Sudoku:
         available_values: List[int] = self.get_available_values(x, y)
         if index == 81:
             return True
-        # backtrace if no available values
-        if not available_values:
-            return False
-        # try all available values
+        random.shuffle(available_values, self.random.random)
         for available_value in available_values:
             self.table[index] = available_value
             if self.generate(index + 1):
                 return True
-        # backtrace if no available_values
         self.table[index] = 0
         return False
 
@@ -49,5 +49,5 @@ class Sudoku:
 
 
 if __name__ == "__main__":
-    sudoku: Sudoku = Sudoku()
+    sudoku: Sudoku = Sudoku(int(sys.argv[1]))
     print(sudoku.print())
