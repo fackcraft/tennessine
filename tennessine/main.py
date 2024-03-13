@@ -1,70 +1,42 @@
 import configparser
-
 from typing import Tuple, Union
 
 import pygame
 
 from tennessine.world import World
+from tennessine.radarmap import RadarMap
 
 config: configparser.ConfigParser = configparser.ConfigParser()
 config.read("config.ini")
 
-x: int = 0
-y: int = 0
-
 RectValue = Tuple[
     Union[float, int], Union[float, int], Union[float, int], Union[float, int]
 ]
-
-
-class RadarMap(pygame.sprite.Sprite):
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.image: pygame.surface.Surface = pygame.Surface(
-            (
-                config.getint("radarmap", "width"),
-                config.getint("radarmap", "width")
-                * config.getint("world", "height")
-                / config.getint("world", "width"),
-            )
-        )
-        self.rect: pygame.rect.Rect = self.image.get_rect()
-        self.rect.x = config.getint("window", "width") - config.getint(
-            "radarmap", "width"
-        )
-
-    def update(self) -> None:
-        # draw
-        pygame.draw.rect(
-            self.image,
-            (255, 255, 255),
-            (
-                self.image.get_width() * x / config.getint("world", "width"),
-                self.image.get_height() * y / config.getint("world", "height"),
-                self.image.get_width()
-                * config.getint("window", "width")
-                / config.getint("world", "width"),
-                self.image.get_height()
-                * config.getint("window", "height")
-                / config.getint("world", "height"),
-            ),
-            1,
-        )
-
 
 if __name__ == "__main__":
     pygame.init()
     screen: pygame.surface.Surface = pygame.display.set_mode(
         (config.getint("window", "width"), config.getint("window", "height"))
     )
-    world: World = World((config.getint("world", "width"), config.getint("world", "height")))
+    world: World = World(
+        (config.getint("world", "width"), config.getint("world", "height")), screen
+    )
     clock: pygame.time.Clock = pygame.time.Clock()
     group: pygame.sprite.Group = pygame.sprite.Group()
-    radar_map: RadarMap = RadarMap()
+    radar_map: RadarMap = RadarMap(
+        world,
+        (
+            config.getint("radarmap", "width"),
+            config.getint("radarmap", "width")
+            * world.image.get_height()
+            / world.image.get_width(),
+        ),
+    )
+
     group.add(radar_map)
     running: bool = True
     delay: float = 0
+    step: int = config.getint("move", "step")
 
     while running:
         for event in pygame.event.get():
@@ -73,36 +45,28 @@ if __name__ == "__main__":
 
         keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            if y - config.getint("move", "step") < 0:
-                y: int = 0
+            if world.visual_y - step < 0:
+                world.visual_y = 0
             else:
-                y -= config.getint("move", "step")
+                world.visual_y -= step
         if keys[pygame.K_LEFT]:
-            if x - config.getint("move", "step") < 0:
-                x: int = 0
+            if world.visual_x - step < 0:
+                world.visual_x = 0
             else:
-                x -= config.getint("move", "step")
+                world.visual_x -= step
         if keys[pygame.K_DOWN]:
-            if y + config.getint("move", "step") + config.getint(
-                "window", "height"
-            ) > config.getint("world", "height"):
-                y: int = config.getint("world", "height") - config.getint(
-                    "window", "height"
-                )
+            if world.visual_y + step + screen.get_height() > world.image.get_height():
+                world.visual_y = world.image.get_height() - screen.get_height()
             else:
-                y += config.getint("move", "step")
+                world.visual_y += step
         if keys[pygame.K_RIGHT]:
-            if x + config.getint("move", "step") + config.getint(
-                "window", "width"
-            ) > config.getint("world", "width"):
-                x: int = config.getint("world", "width") - config.getint(
-                    "window", "width"
-                )
+            if world.visual_x + step + screen.get_width() > world.image.get_width():
+                world.visual_x = world.image.get_width() - screen.get_width()
             else:
-                x += config.getint("move", "step")
+                world.visual_x += step
 
         background: pygame.surface.Surface = world.image.subsurface(
-            (x, y, config.getint("window", "width"), config.getint("window", "height"))
+            (world.visual_x, world.visual_y, screen.get_width(), screen.get_height())
         )
         screen.blit(background, (0, 0))
 

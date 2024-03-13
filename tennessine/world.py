@@ -33,11 +33,12 @@ def draw(surface: pygame.surface.Surface):
 
 
 class World(pygame.sprite.Sprite):
-    def __init__(self, size: Tuple[int, int]) -> None:
+    visual_x: int = 0
+    visual_y: int = 0
+
+    def __init__(self, size: Tuple[int, int], screen: pygame.surface.Surface) -> None:
         super().__init__()
 
         self.image: pygame.surface.Surface = pygame.Surface(size)
-        self._install_rects()
-
-    def _install_rects(self):
+        self.screen: pygame.surface.Surface = screen
         draw(self.image)

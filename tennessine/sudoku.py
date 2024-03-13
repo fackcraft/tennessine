@@ -25,6 +25,9 @@ class Sudoku:
         self.table[index] = 0
         return False
 
+    def dig(self):
+        pass
+
     def get_available_values(self, x: int, y: int) -> List[int]:
         available_values: List[int] = [i for i in range(1, 10)]
         for index, value in enumerate(self.table):
@@ -51,3 +54,4 @@ class Sudoku:
 if __name__ == "__main__":
     sudoku: Sudoku = Sudoku(int(sys.argv[1]))
     print(sudoku.print())
+
