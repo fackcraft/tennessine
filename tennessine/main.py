@@ -48,7 +48,9 @@ if __name__ == "__main__":
             cp.getint("sudoku", "height"),
         )
     )
-    group.add(sudoku)
+    # group.add(sudoku)
+    for board in sudoku.board:
+        group.add(board)
 
     running: bool = True
     delay: float = 0
