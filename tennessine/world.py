@@ -4,15 +4,15 @@ from typing import Tuple
 import pygame
 
 
-def draw(surface: pygame.surface.Surface):
+def draw(surface: pygame.surface.Surface, file_name: str = "transgender_pride_flag.ini"):
     cp: configparser.ConfigParser = configparser.ConfigParser()
-    cp.read("gay_pride_flag.ini")
+    cp.read(file_name)
 
     rlist = cp["background"]["rects"]
     rlist = rlist.split(",")
     rlist = map(str.strip, rlist)
-    wwidth: int = cp.getint("background", "width")
-    wheight: int = cp.getint("background", "height")
+    world_width: int = cp.getint("background", "width")
+    world_height: int = cp.getint("background", "height")
     for form in rlist:
         sectname = "rect_%s" % form
         color: str = cp.get(sectname, "color")
@@ -24,10 +24,10 @@ def draw(surface: pygame.surface.Surface):
             surface,
             color,
             (
-                x * surface.get_width() / wwidth,
-                y * surface.get_height() / wheight,
-                width * surface.get_width() / wwidth,
-                height * surface.get_height() / wheight,
+                x * surface.get_width() / world_width,
+                y * surface.get_height() / world_height,
+                width * surface.get_width() / world_width,
+                height * surface.get_height() / world_height,
             ),
         )
 
@@ -36,9 +36,9 @@ class World(pygame.sprite.Sprite):
     visual_x: int = 0
     visual_y: int = 0
 
-    def __init__(self, size: Tuple[int, int], screen: pygame.surface.Surface) -> None:
+    def __init__(self, size: Tuple[int, int], screen: pygame.surface.Surface, file_name: str = "transgender_pride_flag.ini") -> None:
         super().__init__()
 
         self.image: pygame.surface.Surface = pygame.Surface(size)
         self.screen: pygame.surface.Surface = screen
-        draw(self.image)
+        draw(self.image, file_name)

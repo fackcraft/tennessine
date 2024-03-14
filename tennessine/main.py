@@ -5,9 +5,10 @@ import pygame
 
 from tennessine.world import World
 from tennessine.radarmap import RadarMap
+from tennessine.sudoku import Sudoku
 
-config: configparser.ConfigParser = configparser.ConfigParser()
-config.read("config.ini")
+cp: configparser.ConfigParser = configparser.ConfigParser()
+cp.read("config.ini")
 
 RectValue = Tuple[
     Union[float, int], Union[float, int], Union[float, int], Union[float, int]
@@ -16,27 +17,42 @@ RectValue = Tuple[
 if __name__ == "__main__":
     pygame.init()
     screen: pygame.surface.Surface = pygame.display.set_mode(
-        (config.getint("window", "width"), config.getint("window", "height"))
+        (cp.getint("window", "width"), cp.getint("window", "height"))
     )
-    world: World = World(
-        (config.getint("world", "width"), config.getint("world", "height")), screen
-    )
+
     clock: pygame.time.Clock = pygame.time.Clock()
     group: pygame.sprite.Group = pygame.sprite.Group()
+
+    world: World = World(
+        (cp.getint("world", "width"), cp.getint("world", "height")),
+        screen,
+        cp.get("world", "background", fallback="transgender_pride_flag.ini"),
+    )
+
     radar_map: RadarMap = RadarMap(
         world,
         (
-            config.getint("radarmap", "width"),
-            config.getint("radarmap", "width")
+            cp.getint("radarmap", "width"),
+            cp.getint("radarmap", "width")
             * world.image.get_height()
             / world.image.get_width(),
         ),
     )
-
     group.add(radar_map)
+
+    sudoku: Sudoku = Sudoku(
+        (
+            cp.getint("sudoku", "x", fallback=0),
+            cp.getint("sudoku", "y", fallback=0),
+            cp.getint("sudoku", "width"),
+            cp.getint("sudoku", "height"),
+        )
+    )
+    group.add(sudoku)
+
     running: bool = True
     delay: float = 0
-    step: int = config.getint("move", "step")
+    step: int = cp.getint("move", "step")
 
     while running:
         for event in pygame.event.get():
