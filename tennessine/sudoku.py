@@ -1,22 +1,35 @@
 import random
-from typing import Tuple, List, Any
+from typing import Iterable, Iterator, Tuple, List, Any
 
 import pygame
 
 
 class Cell(pygame.sprite.Sprite):
-    def __init__(self, rect: Tuple[float, float, float, float]) -> None:
+    number: int = 0
+
+    def __init__(
+        self, rect: Tuple[float, float, float, float], sudoku: "Sudoku"
+    ) -> None:
         super().__init__()
 
         # init user interface
         self.image: pygame.surface.Surface = pygame.surface.Surface(rect[2:4])
         self.rect: pygame.rect.Rect = self.image.get_rect()
         self.rect.x, self.rect.y = rect[0:2]
+        self.font: pygame.font.Font = pygame.font.Font(
+            pygame.font.get_default_font(),
+            int(max(sudoku.cell_height, sudoku.cell_height)),
+        )
+        self.image.fill("#FF0000")
 
-        font: pygame.font.Font = pygame.font.Font(pygame.font.get_default_font(), 16)
-        pygame.draw.rect(self.image, "#FF0000", (0, 0) + rect[2:4])
-        text: pygame.surface.Surface = font.render("0", True, "#FFFFFF")
-
+    def set(self, number: int) -> None:
+        self.number = number
+        if number == 0:
+            return
+        self.image.fill("#FF0000")
+        text: pygame.surface.Surface = self.font.render(
+            str(self.number), False, "#FFFFFF"
+        )
         self.image.blit(text, (0, 0))
 
 
@@ -24,14 +37,18 @@ class Board:
     def __init__(self) -> None:
         self.board: List[Cell] = []
 
-    def __getitem__(self, key: int) -> Cell:
-        return self.board[key]
+    def __iter__(self) -> Iterator:
+        for value in self.board:
+            yield value.number
 
-    def __setitem__(self, key: int, value: Cell) -> None:
-        self.board[key] = value
+    def __getitem__(self, key: int) -> int:
+        return self.board[key].number
+
+    def __setitem__(self, key: int, value: int) -> None:
+        self.board[key].set(value)
 
     def __deltiem__(self, key: int) -> None:
-        raise RuntimeError
+        del self.board[key]
 
     def append(self, cell: Cell) -> None:
         self.board.append(cell)
@@ -62,20 +79,23 @@ class Sudoku(pygame.sprite.Sprite):
         self.board: Board = Board()
         for index in range(self.line**2):
             y, x = divmod(index, self.line)
-            self.board.append(Cell(
-                (
-                    x * self.cell_width + x // self.base * self.line_width + 5,
-                    y * self.cell_height + y // self.base * self.line_height + 5,
-                    self.cell_width - 5,
-                    self.cell_height - 5,
-                ),
-            ))
+            self.board.append(
+                Cell(
+                    (
+                        x * self.cell_width + x // self.base * self.line_width + 5,
+                        y * self.cell_height + y // self.base * self.line_height + 5,
+                        self.cell_width - 5,
+                        self.cell_height - 5,
+                    ),
+                    self,
+                )
+            )
 
         # sudoku generate
         if not seed:
             seed = random.random()
         self.random: random.Random = random.Random(seed)
-        # self.generate(0)
+        self.generate(0)
 
     def generate(self, index: int) -> bool:
         y, x = divmod(index, self.line)

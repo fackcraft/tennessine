@@ -7,16 +7,17 @@ from tennessine.world import World
 
 class RadarMap(pygame.sprite.Sprite):
     def __init__(
-        self, world: World, rect: Tuple[Union[float, int], Union[float, int]]
+        self, world: World, size: Tuple[float, float]
     ) -> None:
         super().__init__()
         self.world: World = world
-        self.image: pygame.surface.Surface = pygame.transform.scale(world.image, rect)
+        self.image: pygame.surface.Surface = pygame.transform.scale(world.image, size)
         self.rect: pygame.rect.Rect = self.image.get_rect()
-        # northeast corner
         self.rect.x = world.screen.get_width() - self.image.get_width()
 
     def update(self) -> None:
+        self.image: pygame.surface.Surface = pygame.transform.scale(self.world.image, self.rect[2:4]
+)
         pygame.draw.rect(
             self.image,
             (255, 255, 255),

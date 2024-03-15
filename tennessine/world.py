@@ -33,8 +33,8 @@ def draw(surface: pygame.surface.Surface, file_name: str = "transgender_pride_fl
 
 
 class World(pygame.sprite.Sprite):
-    visual_x: int = 0
-    visual_y: int = 0
+    visual_x: float = 0.0
+    visual_y: float = 0.0
 
     def __init__(self, size: Tuple[int, int], screen: pygame.surface.Surface, file_name: str = "transgender_pride_flag.ini") -> None:
         super().__init__()

@@ -16,12 +16,13 @@ RectValue = Tuple[
 
 if __name__ == "__main__":
     pygame.init()
+    clock: pygame.time.Clock = pygame.time.Clock()
+    group: pygame.sprite.Group = pygame.sprite.Group()
+
+    pygame.display.set_caption("Tennessine")
     screen: pygame.surface.Surface = pygame.display.set_mode(
         (cp.getint("window", "width"), cp.getint("window", "height"))
     )
-
-    clock: pygame.time.Clock = pygame.time.Clock()
-    group: pygame.sprite.Group = pygame.sprite.Group()
 
     world: World = World(
         (cp.getint("world", "width"), cp.getint("world", "height")),
@@ -48,13 +49,17 @@ if __name__ == "__main__":
             cp.getint("sudoku", "height"),
         )
     )
-    # group.add(sudoku)
-    for board in sudoku.board:
-        group.add(board)
+
+    for cell in sudoku.board.board:
+        group.add(cell)
 
     running: bool = True
     delay: float = 0
+
+    tps: int = cp.getint("game", "tps")
     step: int = cp.getint("move", "step")
+    y_offset: int = world.image.get_height() - screen.get_height()
+    x_offset: int = world.image.get_width() - screen.get_width()
 
     while running:
         for event in pygame.event.get():
@@ -62,26 +67,23 @@ if __name__ == "__main__":
                 running: bool = False
 
         keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
-            if world.visual_y - step < 0:
-                world.visual_y = 0
-            else:
-                world.visual_y -= step
-        if keys[pygame.K_LEFT]:
-            if world.visual_x - step < 0:
-                world.visual_x = 0
-            else:
-                world.visual_x -= step
-        if keys[pygame.K_DOWN]:
-            if world.visual_y + step + screen.get_height() > world.image.get_height():
-                world.visual_y = world.image.get_height() - screen.get_height()
-            else:
-                world.visual_y += step
         if keys[pygame.K_RIGHT]:
-            if world.visual_x + step + screen.get_width() > world.image.get_width():
-                world.visual_x = world.image.get_width() - screen.get_width()
-            else:
-                world.visual_x += step
+            world.visual_x += step * delay
+        if keys[pygame.K_DOWN]:
+            world.visual_y += step * delay
+        if keys[pygame.K_LEFT]:
+            world.visual_x -= step * delay
+        if keys[pygame.K_UP]:
+            world.visual_y -= step * delay
+
+        if world.visual_x > x_offset:
+            world.visual_x = x_offset
+        if world.visual_y > y_offset:
+            world.visual_y = y_offset
+        if world.visual_x < 0:
+            world.visual_x = 0
+        if world.visual_y < 0:
+            world.visual_y = 0
 
         background: pygame.surface.Surface = world.image.subsurface(
             (world.visual_x, world.visual_y, screen.get_width(), screen.get_height())
@@ -92,5 +94,5 @@ if __name__ == "__main__":
         group.draw(screen)
         pygame.display.flip()
 
-        delay: float = clock.tick(60) / 1000
+        delay: float = clock.tick(tps) / 1000
     pygame.quit()
