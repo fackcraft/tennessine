@@ -6,6 +6,7 @@ import pygame
 from tennessine.world import World
 from tennessine.radarmap import RadarMap
 from tennessine.sudoku import Sudoku
+from tennessine.dialog import Dialog
 
 cp: configparser.ConfigParser = configparser.ConfigParser()
 cp.read("config.ini")
@@ -41,6 +42,16 @@ if __name__ == "__main__":
     )
     group.add(radar_map)
 
+    dialog: Dialog = Dialog(
+        (
+            10,
+            screen.get_height() - 310,
+            screen.get_width() - 20,
+            300,
+        )
+    )
+    group.add(dialog)
+
     sudoku: Sudoku = Sudoku(
         (
             cp.getint("sudoku", "x", fallback=0),
@@ -50,8 +61,8 @@ if __name__ == "__main__":
         )
     )
 
-    for cell in sudoku.board.board:
-        group.add(cell)
+    # for cell in sudoku.board.board:
+    #     group.add(cell)
 
     running: bool = True
     delay: float = 0

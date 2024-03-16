@@ -20,22 +20,40 @@ class Cell(pygame.sprite.Sprite):
             pygame.font.get_default_font(),
             int(max(sudoku.cell_height, sudoku.cell_height)),
         )
-        self.image.fill("#FF0000")
+        self.draw()
 
-    def set(self, number: int) -> None:
-        self.number = number
-        if number == 0:
+    def draw(self) -> None:
+        self.image.fill("#FFFFFF")
+        pygame.draw.rect(self.image, "#000000", (0, 0, *self.rect[2:4]), 1)
+        if self.number == 0:
             return
-        self.image.fill("#FF0000")
         text: pygame.surface.Surface = self.font.render(
-            str(self.number), False, "#FFFFFF"
+            str(self.number), False, "#000000"
         )
         self.image.blit(text, (0, 0))
 
+    def set(self, number: int) -> None:
+        self.number = number
+        self.draw()
+
 
 class Board:
-    def __init__(self) -> None:
+    def __init__(self, sudoku: "Sudoku") -> None:
+        self.sudoku: "Sudoku" = sudoku
         self.board: List[Cell] = []
+        for index in range(self.sudoku.line**2):
+            y, x = divmod(index, self.sudoku.line)
+            self.board.append(
+                Cell(
+                    (
+                        x * self.sudoku.cell_width + x // self.sudoku.base * self.sudoku.line_width,
+                        y * self.sudoku.cell_height + y // self.sudoku.base * self.sudoku.line_height,
+                        self.sudoku.cell_width,
+                        self.sudoku.cell_height,
+                    ),
+                    sudoku,
+                )
+            )
 
     def __iter__(self) -> Iterator:
         for value in self.board:
@@ -67,29 +85,15 @@ class Sudoku(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = rect[0:2]
 
         # size
-        self.line_width: float = rect[2] / 64
+        self.line_width: float = 10
         self.cell_width: float = (
             rect[2] - (self.base - 1) * self.line_width
         ) / self.line
-        self.line_height: float = rect[3] / 64
+        self.line_height: float = 10
         self.cell_height: float = (
-            rect[3] - (self.base - 3) * self.line_height
+            rect[3] - (self.base - 1) * self.line_height
         ) / self.line
-
-        self.board: Board = Board()
-        for index in range(self.line**2):
-            y, x = divmod(index, self.line)
-            self.board.append(
-                Cell(
-                    (
-                        x * self.cell_width + x // self.base * self.line_width + 5,
-                        y * self.cell_height + y // self.base * self.line_height + 5,
-                        self.cell_width - 5,
-                        self.cell_height - 5,
-                    ),
-                    self,
-                )
-            )
+        self.board: Board = Board(self)
 
         # sudoku generate
         if not seed:
@@ -115,7 +119,7 @@ class Sudoku(pygame.sprite.Sprite):
         return False
 
     def get_candidate_values(self, x: int, y: int) -> List[int]:
-        candidate_values: List[int] = [i for i in range(1, 10)]
+        candidate_values: List[int] = [i for i in range(1, self.line + 1)]
         for index, value in enumerate(self.board):
             j, i = divmod(index, 9)
             if (
@@ -124,8 +128,8 @@ class Sudoku(pygame.sprite.Sprite):
                 # same line
                 or y == j
                 # same chunk
-                or x // 3 * 3 <= i < x // 3 * 3 + 3
-                and y // 3 * 3 <= j < y // 3 * 3 + 3
+                or x // self.base * self.base <= i < x // self.base * self.base + self.base
+                and y // self.base * self.base <= j < y // self.base * self.base + self.base
             ) and value in candidate_values:
                 candidate_values.remove(value)
         return candidate_values
