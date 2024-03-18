@@ -1,3 +1,4 @@
+import pathlib
 import configparser
 from typing import Tuple, Union
 
@@ -8,8 +9,10 @@ from tennessine.radarmap import RadarMap
 from tennessine.sudoku import Sudoku
 from tennessine.dialog import Dialog
 
-cp: configparser.ConfigParser = configparser.ConfigParser()
-cp.read("config.ini")
+root: pathlib.Path = pathlib.Path(__file__).parent.parent
+
+config_parser: configparser.ConfigParser = configparser.ConfigParser()
+config_parser.read(root / "config" / "config.ini")
 
 RectValue = Tuple[
     Union[float, int], Union[float, int], Union[float, int], Union[float, int]
@@ -22,20 +25,26 @@ if __name__ == "__main__":
 
     pygame.display.set_caption("Tennessine")
     screen: pygame.surface.Surface = pygame.display.set_mode(
-        (cp.getint("window", "width"), cp.getint("window", "height"))
+        (
+            config_parser.getint("window", "width"),
+            config_parser.getint("window", "height"),
+        )
     )
 
     world: World = World(
-        (cp.getint("world", "width"), cp.getint("world", "height")),
+        (
+            config_parser.getint("world", "width"),
+            config_parser.getint("world", "height"),
+        ),
         screen,
-        cp.get("world", "background", fallback="transgender_pride_flag.ini"),
+        config_parser.get("world", "background", fallback="transgender_pride_flag.ini"),
     )
 
     radar_map: RadarMap = RadarMap(
         world,
         (
-            cp.getint("radarmap", "width"),
-            cp.getint("radarmap", "width")
+            config_parser.getint("radarmap", "width"),
+            config_parser.getint("radarmap", "width")
             * world.image.get_height()
             / world.image.get_width(),
         ),
@@ -54,21 +63,21 @@ if __name__ == "__main__":
 
     sudoku: Sudoku = Sudoku(
         (
-            cp.getint("sudoku", "x", fallback=0),
-            cp.getint("sudoku", "y", fallback=0),
-            cp.getint("sudoku", "width"),
-            cp.getint("sudoku", "height"),
+            config_parser.getint("sudoku", "x", fallback=0),
+            config_parser.getint("sudoku", "y", fallback=0),
+            config_parser.getint("sudoku", "width"),
+            config_parser.getint("sudoku", "height"),
         )
     )
 
-    # for cell in sudoku.board.board:
-    #     group.add(cell)
+    for cell in sudoku.board.board:
+        group.add(cell)
 
     running: bool = True
     delay: float = 0
 
-    tps: int = cp.getint("game", "tps")
-    step: int = cp.getint("move", "step")
+    tps: int = config_parser.getint("game", "tps")
+    step: int = config_parser.getint("move", "step")
     y_offset: int = world.image.get_height() - screen.get_height()
     x_offset: int = world.image.get_width() - screen.get_width()
 

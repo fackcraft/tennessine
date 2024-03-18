@@ -7,18 +7,14 @@ import pygame
 class Cell(pygame.sprite.Sprite):
     number: int = 0
 
-    def __init__(
-        self, rect: Tuple[float, float, float, float], sudoku: "Sudoku"
-    ) -> None:
+    def __init__(self, rect: Tuple[int, int, int, int], sudoku: "Sudoku") -> None:
         super().__init__()
 
-        # init user interface
         self.image: pygame.surface.Surface = pygame.surface.Surface(rect[2:4])
         self.rect: pygame.rect.Rect = self.image.get_rect()
         self.rect.x, self.rect.y = rect[0:2]
         self.font: pygame.font.Font = pygame.font.Font(
-            pygame.font.get_default_font(),
-            int(max(sudoku.cell_height, sudoku.cell_height)),
+            pygame.font.get_default_font(), 70
         )
         self.draw()
 
@@ -46,10 +42,18 @@ class Board:
             self.board.append(
                 Cell(
                     (
-                        x * self.sudoku.cell_width + x // self.sudoku.base * self.sudoku.line_width,
-                        y * self.sudoku.cell_height + y // self.sudoku.base * self.sudoku.line_height,
-                        self.sudoku.cell_width,
-                        self.sudoku.cell_height,
+                        int(
+                            x * self.sudoku.cell_width
+                            + x // self.sudoku.base * self.sudoku.line_width
+                            + 5
+                        ),
+                        int(
+                            y * self.sudoku.cell_height
+                            + y // self.sudoku.base * self.sudoku.line_height
+                            + 5
+                        ),
+                        int(self.sudoku.cell_width - 10),
+                        int(self.sudoku.cell_height - 10),
                     ),
                     sudoku,
                 )
@@ -79,12 +83,10 @@ class Sudoku(pygame.sprite.Sprite):
     def __init__(self, rect: Tuple[int, int, int, int], seed: Any = None) -> None:
         super().__init__()
 
-        # init user interface
         self.image: pygame.surface.Surface = pygame.surface.Surface(rect[2:4])
         self.rect: pygame.rect.Rect = self.image.get_rect()
         self.rect.x, self.rect.y = rect[0:2]
 
-        # size
         self.line_width: float = 10
         self.cell_width: float = (
             rect[2] - (self.base - 1) * self.line_width
@@ -95,7 +97,6 @@ class Sudoku(pygame.sprite.Sprite):
         ) / self.line
         self.board: Board = Board(self)
 
-        # sudoku generate
         if not seed:
             seed = random.random()
         self.random: random.Random = random.Random(seed)
@@ -128,8 +129,12 @@ class Sudoku(pygame.sprite.Sprite):
                 # same line
                 or y == j
                 # same chunk
-                or x // self.base * self.base <= i < x // self.base * self.base + self.base
-                and y // self.base * self.base <= j < y // self.base * self.base + self.base
+                or x // self.base * self.base
+                <= i
+                < x // self.base * self.base + self.base
+                and y // self.base * self.base
+                <= j
+                < y // self.base * self.base + self.base
             ) and value in candidate_values:
                 candidate_values.remove(value)
         return candidate_values
