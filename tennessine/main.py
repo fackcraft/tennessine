@@ -29,8 +29,11 @@ if __name__ == "__main__":
         (
             config_parser.getint("window", "width"),
             config_parser.getint("window", "height"),
-        )
+        ),
+        pygame.FULLSCREEN,
     )
+
+    print(screen.get_width(), screen.get_height())
 
     world: World = World(
         (
@@ -82,23 +85,18 @@ if __name__ == "__main__":
     x_offset: int = world.image.get_width() - screen.get_width()
     y_offset: int = world.image.get_height() - screen.get_height()
 
-    mouse_position = None
+    cursor_x, cursor_y = pygame.mouse.get_pos()
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running: bool = False
 
-        keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
+        cursor_x_old, cursor_y_old = cursor_x, cursor_y
+        cursor_x, cursor_y = pygame.mouse.get_pos()
 
-        if keys[pygame.K_LEFT]:
-            world.visual_x -= step * delay
-        if keys[pygame.K_RIGHT]:
-            world.visual_x += step * delay
-        if keys[pygame.K_UP]:
-            world.visual_y -= step * delay
-        if keys[pygame.K_DOWN]:
-            world.visual_y += step * delay
+        world.visual_x += cursor_x_old - cursor_x
+        world.visual_y += cursor_y_old - cursor_y
 
         if world.visual_x > x_offset:
             world.visual_x = x_offset
@@ -116,6 +114,7 @@ if __name__ == "__main__":
 
         group.update()
         group.draw(screen)
+
         pygame.display.flip()
 
         delay: float = clock.tick(fps) / 1000

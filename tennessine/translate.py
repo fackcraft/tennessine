@@ -1,4 +1,3 @@
-import enum
 import pathlib
 
 from typing import Dict, Optional
@@ -6,15 +5,9 @@ from typing import Dict, Optional
 root: pathlib.Path = pathlib.Path(__file__).parent.parent
 
 
-class Language(enum.Enum):
-    en_us = 0
-    zh_cn = 1
-
-
 class Translator:
     _instance: Optional["Translator"] = None
     _data: Dict[str, str] = dict()
-    _language: Language = Language.en_us
 
     def __new__(cls) -> "Translator":
         if cls._instance is None:
@@ -33,14 +26,11 @@ class Translator:
         del self._data[key]
 
     def _load_language(self) -> None:
-        language: str = (
-            "en_us.lang" if self._language == Language.en_us else "zh_cn.lang"
-        )
-        with open(root / "config" / "lang" / language, "r") as file:
+        with open(root / "config" / "lang" / "zh_cn.lang", "r") as file:
             while True:
                 line: str = file.readline()
                 if not line:
-                    return
+                    break
                 if "=" not in line:
                     continue
                 key, value = line.split("=")

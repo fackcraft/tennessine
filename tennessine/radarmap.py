@@ -1,4 +1,5 @@
 from typing import Tuple
+
 import pygame
 
 from tennessine.world import World
