@@ -2,6 +2,10 @@ from typing import Tuple, List
 
 import pygame
 
+from tennessine.translate import Translator
+
+translator: Translator = Translator()
+
 
 def _wrap(text: str) -> List[str]:
     text_lines: List[str] = []
@@ -29,9 +33,7 @@ class Dialog(pygame.sprite.Sprite):
         self.font: pygame.font.Font = pygame.font.Font(
             pygame.font.get_default_font(), 30
         )
-        self.text: List[str] = _wrap(
-            "Tennessine is a synthetic chemical element. It has symbol Ts and atomic number 117. It has the second-highest atomic number and joint-highest atomic mass of all known elements, and is the penultimate element of the 7th period of the periodic table."
-        )
+        self.text: List[str] = _wrap(translator["welcome"])
         self._draw()
 
     def _draw(self) -> None:

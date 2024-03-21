@@ -18,6 +18,7 @@ RectValue = Tuple[
     Union[float, int], Union[float, int], Union[float, int], Union[float, int]
 ]
 
+
 if __name__ == "__main__":
     pygame.init()
     clock: pygame.time.Clock = pygame.time.Clock()
@@ -37,7 +38,7 @@ if __name__ == "__main__":
             config_parser.getint("world", "height"),
         ),
         screen,
-        config_parser.get("world", "background", fallback="transgender_pride_flag.ini"),
+        str(root / "config" / "img" / config_parser.get("world", "background")),
     )
 
     radar_map: RadarMap = RadarMap(
@@ -76,10 +77,12 @@ if __name__ == "__main__":
     running: bool = True
     delay: float = 0
 
-    tps: int = config_parser.getint("game", "tps")
+    fps: int = config_parser.getint("game", "fps")
     step: int = config_parser.getint("move", "step")
-    y_offset: int = world.image.get_height() - screen.get_height()
     x_offset: int = world.image.get_width() - screen.get_width()
+    y_offset: int = world.image.get_height() - screen.get_height()
+
+    mouse_position = None
 
     while running:
         for event in pygame.event.get():
@@ -87,14 +90,15 @@ if __name__ == "__main__":
                 running: bool = False
 
         keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
-        if keys[pygame.K_RIGHT]:
-            world.visual_x += step * delay
-        if keys[pygame.K_DOWN]:
-            world.visual_y += step * delay
+
         if keys[pygame.K_LEFT]:
             world.visual_x -= step * delay
+        if keys[pygame.K_RIGHT]:
+            world.visual_x += step * delay
         if keys[pygame.K_UP]:
             world.visual_y -= step * delay
+        if keys[pygame.K_DOWN]:
+            world.visual_y += step * delay
 
         if world.visual_x > x_offset:
             world.visual_x = x_offset
@@ -114,5 +118,5 @@ if __name__ == "__main__":
         group.draw(screen)
         pygame.display.flip()
 
-        delay: float = clock.tick(tps) / 1000
+        delay: float = clock.tick(fps) / 1000
     pygame.quit()

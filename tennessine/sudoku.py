@@ -1,5 +1,5 @@
 import random
-from typing import Iterable, Iterator, Tuple, List, Any
+from typing import Iterator, Tuple, List, Any
 
 import pygame
 
@@ -10,6 +10,7 @@ class Cell(pygame.sprite.Sprite):
     def __init__(self, rect: Tuple[int, int, int, int], sudoku: "Sudoku") -> None:
         super().__init__()
 
+        self.sudoku: "Sudoku" = sudoku
         self.image: pygame.surface.Surface = pygame.surface.Surface(rect[2:4])
         self.rect: pygame.rect.Rect = self.image.get_rect()
         self.rect.x, self.rect.y = rect[0:2]
@@ -35,28 +36,27 @@ class Cell(pygame.sprite.Sprite):
 
 class Board:
     def __init__(self, sudoku: "Sudoku") -> None:
-        self.sudoku: "Sudoku" = sudoku
         self.board: List[Cell] = []
-        for index in range(self.sudoku.line**2):
-            y, x = divmod(index, self.sudoku.line)
+        for index in range(sudoku.line**2):
+            y, x = divmod(index, sudoku.line)
             self.board.append(
                 Cell(
                     (
                         int(
-                            x * self.sudoku.cell_width
-                            + x // self.sudoku.base * self.sudoku.line_width
+                            x * sudoku.cell_width
+                            + x // sudoku.base * sudoku.line_width
                             + 5
                         ),
                         int(
-                            y * self.sudoku.cell_height
-                            + y // self.sudoku.base * self.sudoku.line_height
+                            y * sudoku.cell_height
+                            + y // sudoku.base * sudoku.line_height
                             + 5
                         ),
-                        int(self.sudoku.cell_width - 10),
-                        int(self.sudoku.cell_height - 10),
+                        int(sudoku.cell_width - 10),
+                        int(sudoku.cell_height - 10),
                     ),
                     sudoku,
-                )
+                ),
             )
 
     def __iter__(self) -> Iterator:
@@ -71,9 +71,6 @@ class Board:
 
     def __deltiem__(self, key: int) -> None:
         del self.board[key]
-
-    def append(self, cell: Cell) -> None:
-        self.board.append(cell)
 
 
 class Sudoku(pygame.sprite.Sprite):
