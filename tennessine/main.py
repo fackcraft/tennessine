@@ -5,9 +5,11 @@ from typing import Tuple, Union
 import pygame
 
 from tennessine.world import World
-from tennessine.radarmap import RadarMap
+from tennessine.radar_map import RadarMap
 from tennessine.sudoku import Sudoku
 from tennessine.dialog import Dialog
+
+# from tennessine.config import ConfigParser
 
 root: pathlib.Path = pathlib.Path(__file__).parent.parent
 
@@ -30,10 +32,7 @@ if __name__ == "__main__":
             config_parser.getint("window", "width"),
             config_parser.getint("window", "height"),
         ),
-        pygame.FULLSCREEN,
     )
-
-    print(screen.get_width(), screen.get_height())
 
     world: World = World(
         (
@@ -47,8 +46,8 @@ if __name__ == "__main__":
     radar_map: RadarMap = RadarMap(
         world,
         (
-            config_parser.getint("radarmap", "width"),
-            config_parser.getint("radarmap", "width")
+            config_parser.getint("radar_map", "width"),
+            config_parser.getint("radar_map", "width")
             * world.image.get_height()
             / world.image.get_width(),
         ),
@@ -67,21 +66,18 @@ if __name__ == "__main__":
 
     sudoku: Sudoku = Sudoku(
         (
-            config_parser.getint("sudoku", "x", fallback=0),
-            config_parser.getint("sudoku", "y", fallback=0),
+            config_parser.getint("sudoku", "x"),
+            config_parser.getint("sudoku", "y"),
             config_parser.getint("sudoku", "width"),
             config_parser.getint("sudoku", "height"),
         )
     )
-
-    for cell in sudoku.board.board:
-        group.add(cell)
+    # group.add(sudoku)
 
     running: bool = True
     delay: float = 0
 
     fps: int = config_parser.getint("game", "fps")
-    step: int = config_parser.getint("move", "step")
     x_offset: int = world.image.get_width() - screen.get_width()
     y_offset: int = world.image.get_height() - screen.get_height()
 
@@ -95,8 +91,11 @@ if __name__ == "__main__":
         cursor_x_old, cursor_y_old = cursor_x, cursor_y
         cursor_x, cursor_y = pygame.mouse.get_pos()
 
-        world.visual_x += cursor_x_old - cursor_x
-        world.visual_y += cursor_y_old - cursor_y
+        left, middle, right = pygame.mouse.get_pressed()
+
+        if left:
+            world.visual_x += cursor_x_old - cursor_x
+            world.visual_y += cursor_y_old - cursor_y
 
         if world.visual_x > x_offset:
             world.visual_x = x_offset

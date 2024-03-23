@@ -31,7 +31,8 @@ class Dialog(pygame.sprite.Sprite):
         self.rect: pygame.rect.Rect = self.image.get_rect()
         self.rect.x, self.rect.y = rect[0:2]
         self.font: pygame.font.Font = pygame.font.Font(
-            pygame.font.get_default_font(), 30
+            "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+            30,
         )
         self.text: List[str] = _wrap(translator["welcome"])
         self._draw()
